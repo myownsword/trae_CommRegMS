@@ -137,14 +137,12 @@ const errors = reactive({
 
 const toLocalInputValue = (isoStr) => {
   if (!isoStr) return ''
-  const d = new Date(isoStr)
-  const pad = (n) => String(n).padStart(2, '0')
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
+  return isoStr.slice(0, 16)
 }
 
 const toISO = (localVal) => {
   if (!localVal) return null
-  return new Date(localVal).toISOString()
+  return localVal.length === 16 ? localVal + ':00' : localVal
 }
 
 const validate = () => {

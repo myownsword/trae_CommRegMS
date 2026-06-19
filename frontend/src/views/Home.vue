@@ -161,9 +161,7 @@ const statusBadgeClass = (status) => {
 
 const formatDateTime = (dt) => {
   if (!dt) return ''
-  const d = new Date(dt)
-  const pad = (n) => String(n).padStart(2, '0')
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`
+  return dt.replace('T', ' ').slice(0, 16)
 }
 
 const truncateText = (text, max) => {

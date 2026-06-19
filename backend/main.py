@@ -53,7 +53,7 @@ def _init_demo_data(db: Session):
     if existing > 0:
         return
 
-    now = datetime.utcnow()
+    now = datetime.now()
     demo_activities = [
         Activity(
             title="社区乒乓球友谊赛",

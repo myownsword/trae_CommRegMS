@@ -56,7 +56,7 @@ def update_activity(db: Session, db_activity: Activity, activity_in: ActivityUpd
     update_data = activity_in.model_dump(exclude_unset=True)
     for field, value in update_data.items():
         setattr(db_activity, field, value)
-    db_activity.updated_at = datetime.utcnow()
+    db_activity.updated_at = datetime.now()
     db.commit()
     db.refresh(db_activity)
     return db_activity
@@ -64,7 +64,7 @@ def update_activity(db: Session, db_activity: Activity, activity_in: ActivityUpd
 
 def cancel_activity(db: Session, db_activity: Activity) -> Activity:
     db_activity.status = ActivityStatus.CANCELLED
-    db_activity.updated_at = datetime.utcnow()
+    db_activity.updated_at = datetime.now()
     db.commit()
     db.refresh(db_activity)
     return db_activity
@@ -108,7 +108,7 @@ def get_active_registration_by_phone(db: Session, activity_id: int, phone: str) 
 
 def cancel_registration(db: Session, db_reg: Registration) -> Registration:
     db_reg.status = RegistrationStatus.CANCELLED
-    db_reg.updated_at = datetime.utcnow()
+    db_reg.updated_at = datetime.now()
     db.commit()
     db.refresh(db_reg)
     return db_reg

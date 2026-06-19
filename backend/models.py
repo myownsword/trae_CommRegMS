@@ -28,8 +28,8 @@ class Activity(Base):
     max_participants = Column(Integer, nullable=False)
     description = Column(Text, nullable=True)
     status = Column(Enum(ActivityStatus), default=ActivityStatus.OPEN, nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    created_at = Column(DateTime, default=datetime.now, nullable=False)
+    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now, nullable=False)
 
     registrations = relationship("Registration", back_populates="activity")
 
@@ -43,7 +43,7 @@ class Registration(Base):
     phone = Column(String(20), nullable=False, index=True)
     remark = Column(Text, nullable=True)
     status = Column(Enum(RegistrationStatus), default=RegistrationStatus.ACTIVE, nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    created_at = Column(DateTime, default=datetime.now, nullable=False)
+    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now, nullable=False)
 
     activity = relationship("Activity", back_populates="registrations")
