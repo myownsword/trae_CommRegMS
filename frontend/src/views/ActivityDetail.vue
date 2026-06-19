@@ -120,43 +120,84 @@
       </div>
 
       <div class="card">
-        <h2 class="section-title">报名名单（{{ activity.current_participants }}人）</h2>
-        <div v-if="activeRegistrations.length === 0" class="empty-state" style="padding: 2rem 1rem;">
-          <div style="font-size: 36px; margin-bottom: 0.5rem;">📋</div>
-          <p>暂无报名记录</p>
+        <div class="reg-header">
+          <h2 class="section-title" style="margin-bottom:0;">报名名单</h2>
+          <div class="reg-tabs">
+            <button
+              class="reg-tab"
+              :class="{ active: regTab === 'active' }"
+              @click="regTab = 'active'"
+            >
+              已报名（{{ activeRegistrations.length }}）
+            </button>
+            <button
+              class="reg-tab"
+              :class="{ active: regTab === 'cancelled' }"
+              @click="regTab = 'cancelled'"
+            >
+              已取消（{{ cancelledRegistrations.length }}）
+            </button>
+          </div>
         </div>
-        <div v-else class="table-wrapper">
-          <table>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>姓名</th>
-                <th>手机号</th>
-                <th>备注</th>
-                <th>报名时间</th>
-                <th>状态</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(reg, idx) in activity.registrations" :key="reg.id">
-                <td>{{ idx + 1 }}</td>
-                <td>{{ reg.name }}</td>
-                <td>{{ maskPhone(reg.phone) }}</td>
-                <td>{{ reg.remark || '-' }}</td>
-                <td>{{ formatDateTime(reg.created_at) }}</td>
-                <td>
-                  <span
-                    :class="[
-                      'badge',
-                      reg.status === 'active' ? 'badge-success' : 'badge-gray',
-                    ]"
-                  >
-                    {{ reg.status === 'active' ? '已报名' : '已取消' }}
-                  </span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+
+        <div v-if="regTab === 'active'">
+          <div v-if="activeRegistrations.length === 0" class="empty-state" style="padding: 2rem 1rem;">
+            <div style="font-size: 36px; margin-bottom: 0.5rem;">📋</div>
+            <p>暂无报名记录</p>
+          </div>
+          <div v-else class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>姓名</th>
+                  <th>手机号</th>
+                  <th>备注</th>
+                  <th>报名时间</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(reg, idx) in activeRegistrations" :key="reg.id">
+                  <td>{{ idx + 1 }}</td>
+                  <td>{{ reg.name }}</td>
+                  <td>{{ maskPhone(reg.phone) }}</td>
+                  <td>{{ reg.remark || '-' }}</td>
+                  <td>{{ formatDateTime(reg.created_at) }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div v-if="regTab === 'cancelled'">
+          <div v-if="cancelledRegistrations.length === 0" class="empty-state" style="padding: 2rem 1rem;">
+            <div style="font-size: 36px; margin-bottom: 0.5rem;">📋</div>
+            <p>暂无取消记录</p>
+          </div>
+          <div v-else class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>姓名</th>
+                  <th>手机号</th>
+                  <th>备注</th>
+                  <th>报名时间</th>
+                  <th>取消时间</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(reg, idx) in cancelledRegistrations" :key="reg.id">
+                  <td>{{ idx + 1 }}</td>
+                  <td class="text-muted">{{ reg.name }}</td>
+                  <td class="text-muted">{{ maskPhone(reg.phone) }}</td>
+                  <td class="text-muted">{{ reg.remark || '-' }}</td>
+                  <td class="text-muted">{{ formatDateTime(reg.created_at) }}</td>
+                  <td>{{ formatDateTime(reg.updated_at) }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
@@ -312,6 +353,7 @@ const cancelRegErrors = reactive({ phone: '' })
 
 const showCancelActivity = ref(false)
 const cancelling = ref(false)
+const regTab = ref('active')
 
 const statusLabel = (status) => {
   const map = { open: '报名中', draft: '草稿', closed: '已结束', cancelled: '已取消' }
@@ -348,6 +390,10 @@ const canCancelRegistration = computed(() => {
 
 const activeRegistrations = computed(() => {
   return (activity.value?.registrations || []).filter((r) => r.status === 'active')
+})
+
+const cancelledRegistrations = computed(() => {
+  return (activity.value?.registrations || []).filter((r) => r.status === 'cancelled')
 })
 
 const loadActivity = async () => {
@@ -627,6 +673,52 @@ onMounted(() => loadActivity())
   font-weight: 600;
   color: var(--gray-900);
   margin: 0 0 1rem 0;
+}
+
+.reg-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.reg-tabs {
+  display: flex;
+  gap: 0;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.reg-tab {
+  padding: 0.5rem 1.125rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  border: none;
+  background: white;
+  color: var(--gray-600);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.reg-tab:not(:last-child) {
+  border-right: 1px solid var(--gray-200);
+}
+
+.reg-tab:hover:not(.active) {
+  background-color: var(--gray-50);
+  color: var(--gray-800);
+}
+
+.reg-tab.active {
+  background-color: var(--primary);
+  color: white;
+}
+
+.text-muted {
+  color: var(--gray-400);
 }
 
 .table-wrapper {
